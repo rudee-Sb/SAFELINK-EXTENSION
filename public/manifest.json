@@ -1,0 +1,40 @@
+{
+    "name": "SafeLink Extension",
+    "version": "1.0.0",
+    "description": "Detects and hides sensitive data like emails, phone numbers, and personal info on web pages in real time.",
+    "manifest_version": 3,
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        },
+        "default_title": "Safelink Privacy Shield",
+        "default_popup": "popup.html"
+    },
+    "host_permissions": ["<all_urls>"]
+}
