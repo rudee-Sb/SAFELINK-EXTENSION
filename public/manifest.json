@@ -4,9 +4,9 @@
     "description": "Detects and hides sensitive data like emails, phone numbers, and personal info on web pages in real time.",
     "manifest_version": 3,
     "icons": {
-        "16": "icons/icon16.png",
-        "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
+        "16": "icons/icon16.jpg",
+        "48": "icons/icon48.jpg",
+        "128": "icons/icon128.jpg"
     },
     "background": {
         "service_worker": "background.js"
@@ -29,12 +29,12 @@
     ],
     "action": {
         "default_icon": {
-            "16": "icons/icon16.png",
-            "48": "icons/icon48.png",
-            "128": "icons/icon128.png"
+            "16": "icons/icon16.jpg",
+            "48": "icons/icon48.jpg",
+            "128": "icons/icon128.jpg"
         },
         "default_title": "Safelink Privacy Shield",
-        "default_popup": "popup.html"
+        "default_popup": "/src/popup.html"
     },
     "host_permissions": ["<all_urls>"]
 }
