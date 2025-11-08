@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "SafeLink Extension",
     "version": "1.0.0",
-    "description": "Detects and hides sensitive data like emails, phone numbers, and personal info on web pages in real time.",
+    "description": "Detects and hides sensitive data on web pages in real time.",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
