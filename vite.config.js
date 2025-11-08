@@ -1,23 +1,23 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from "path";
+import { resolve } from 'path';
 
 export default defineConfig({
     plugins: [react()],
     build: {
         rollupOptions: {
             input: {
-                popup: resolve(__dirname, "src/popup.html"),
+                popup: resolve(__dirname, 'src/popup.html')
             },
             output: {
-                entryFileNames: `[name].js`,
-            },
+                entryFileNames: `[name].js`
+            }
         },
         outDir: 'dist',
-        emptyOutDir: false
+        emptyOutDir: true,
+        copyPublicDir: true // copies public/* into dist
     },
-    root: './',
     server: {
-        port: 5173,
-    },
+        port: 5173
+    }
 });

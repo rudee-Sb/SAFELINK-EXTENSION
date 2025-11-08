@@ -93,7 +93,7 @@ function scanSubtree(root) {
         acceptNode: (node) => {
             if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
             const p = node.parentNode;
-            if (!p || forbidden_tags.has(p.nodeName)) return NodeFilter.FILTER_REJECT;
+            if (!p || forbidden_tags.includes(p.nodeName)) return NodeFilter.FILTER_REJECT;
             // skip contenteditable areas (we don't want to mutate user inputs)
             if (p.closest && p.closest('[contenteditable="true"]')) return NodeFilter.FILTER_REJECT;
             // skip inputs
@@ -188,9 +188,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.type === "APPLY_BLUR") {
         if (msg.enabled) enableBlur();
         else disableBlur();
+
         sendResponse({ status: "ok" });
-    } else if (msg?.type === "REQUEST_STATUS") {
+        return true; // <-- THIS LINE IS THE LIFEGIVER
+    }
+
+    if (msg?.type === "REQUEST_STATUS") {
         const any = !!document.querySelector(`.${maskClass}`);
         sendResponse({ enabled: any });
+        return true; // <-- ALSO IMPORTANT
     }
-})
+
+    return true; // keep the message channel open
+});

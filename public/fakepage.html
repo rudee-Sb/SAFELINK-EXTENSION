@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>SafeLink Test Page — Fake Sensitive Data</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        body {
+            font-family: Inter, Arial, sans-serif;
+            background: #0f172a;
+            color: #e6eef8;
+            padding: 24px;
+        }
+
+        .card {
+            background: #0b1220;
+            border: 1px solid #142032;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            margin: 0 0 16px 0;
+            color: #9fe3c5;
+        }
+
+        p.sample {
+            margin: 8px 0;
+            color: #cfe7ff;
+        }
+
+        .small {
+            font-size: 0.9rem;
+            color: #9fb4c8;
+        }
+
+        .grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .btn {
+            background: #1f6feb;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .danger {
+            background: #ff5b5b;
+        }
+
+        .muted {
+            color: #94a3b8
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px dashed #213247;
+            text-align: left
+        }
+
+        .floating {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            background: #102033;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #223344;
+            background: #041226;
+            color: #cfe7ff;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>SafeLink — Fake PII Playground</h1>
+
+    <div class="card">
+        <h2>Contact info (inline)</h2>
+        <p class="sample">Email: alice.wonderland@example.com</p>
+        <p class="sample">Phone (local): 123-456-7890</p>
+        <p class="sample">Phone (intl): +91 98765 43210</p>
+        <p class="sample">Alternate: 123 456 7890</p>
+        <p class="small muted">These appear as plain text in paragraphs — your content script should detect & blur them.
+        </p>
+    </div>
+
+    <div class="card grid">
+        <div>
+            <h3>Cards & Numbers</h3>
+            <p class="sample">Credit-like: 4111 1111 1111 1111</p>
+            <p class="sample">Visa-ish: 4012888888881881</p>
+            <p class="sample">Shortish (test): 1234-5678-9012-345</p>
+        </div>
+        <div>
+            <h3>ID examples (India)</h3>
+            <p class="sample">PAN: ABCDE1234F</p>
+            <p class="sample">Aadhaar: 1234 5678 9012</p>
+            <p class="sample">Aadhaar (no spaces): 123456789012</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Table of users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Rudee</td>
+                    <td>rudee@example.org</td>
+                    <td>+44 7700 900123</td>
+                </tr>
+                <tr>
+                    <td>Test User</td>
+                    <td>test.user@acme.co</td>
+                    <td>98765 43210</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="small muted">Tables should be scanned too.</p>
+    </div>
+
+    <div class="card">
+        <h2>Form & Inputs (should NOT be masked by default)</h2>
+        <form id="loginForm" class="small">
+            <label>Username</label>
+            <input type="text" value="alice" />
+            <label>Password</label>
+            <input type="password" value="supersecret" />
+            <label>Card number</label>
+            <input type="text" value="4111 1111 1111 1111" />
+            <p class="muted">By default SafeLink avoids mutating inputs; test behavior separately if you add
+                input-masking support.</p>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Dynamic content (mutation observer test)</h2>
+        <p id="dynamicBox" class="sample">No dynamic PII yet.</p>
+        <div style="margin-top:8px;">
+            <button class="btn" id="addEmail">Add Email</button>
+            <button class="btn" id="addPhone">Add Phone</button>
+            <button class="btn danger" id="addCard">Add Card-like</button>
+        </div>
+        <p class="muted small">Click buttons to append text nodes after the page loads — your observer should catch
+            them.</p>
+    </div>
+
+    <div class="card">
+        <h2>Mixed content & contentEditable</h2>
+        <p>Editable area (should be skipped):</p>
+        <div contenteditable="true" style="background:#021025; padding:8px; border-radius:6px; min-height:60px;">
+            Try typing: 98765 43210 or someone@example.com — content script should skip editing this region.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Modal / overlay simulation</h2>
+        <p>Click the button to pop up a modal that contains PII (observer must handle it).</p>
+        <button class="btn" id="openModal">Open Modal</button>
+    </div>
+
+    <div class="floating" id="statusBubble">SafeLink test page</div>
+
+    <!-- Modal markup (hidden by default) -->
+    <div id="modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999; align-items:center; justify-content:center;">
+        <div
+            style="background:#081626; padding:18px; border-radius:10px; width:480px; margin:auto; box-shadow:0 12px 36px rgba(0,0,0,0.7);">
+            <h3 style="margin-top:0">Modal with PII</h3>
+            <p class="sample">Contact: modal.person@example.com</p>
+            <p class="sample">Card: 5555-4444-3333-2222</p>
+            <div style="text-align:right"><button class="btn" id="closeModal">Close</button></div>
+        </div>
+    </div>
+
+    <script>
+        // small helpers to append content and test MutationObserver
+        document.getElementById('addEmail').addEventListener('click', () => {
+            const el = document.createElement('p');
+            el.className = 'sample';
+            el.textContent = 'New dynamic email: dynamic.user+' + Math.floor(Math.random() * 999) + '@example.test';
+            document.getElementById('dynamicBox').after(el);
+        });
+
+        document.getElementById('addPhone').addEventListener('click', () => {
+            const el = document.createElement('p');
+            el.className = 'sample';
+            el.textContent = 'New dynamic phone: +1 ' + Math.floor(100000000 + Math.random() * 900000000);
+            document.getElementById('dynamicBox').after(el);
+        });
+
+        document.getElementById('addCard').addEventListener('click', () => {
+            const el = document.createElement('p');
+            el.className = 'sample';
+            el.textContent = 'New dynamic card: ' + Math.floor(4000000000000000 + Math.random() * 1000000000000000);
+            document.getElementById('dynamicBox').after(el);
+        });
+
+        document.getElementById('openModal').addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'flex';
+        });
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'none';
+        });
+
+        // auto-insert a few nodes after 2s to simulate async content
+        setTimeout(() => {
+            const el = document.createElement('p');
+            el.className = 'sample';
+            el.textContent = 'Async loaded phone: 1234567890';
+            document.getElementById('dynamicBox').after(el);
+        }, 2000);
+    </script>
+</body>
+
+</html>
