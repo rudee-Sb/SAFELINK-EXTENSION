@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
+import "./popup.css";
 
 function Popup() {
     const [enabled, setEnabled] = useState(false);
@@ -15,45 +16,42 @@ function Popup() {
     const toggleBlur = () => {
         const newState = !enabled;
         setEnabled(newState);
-        // persist locally
         chrome.storage.sync.set({ safelinkBlurEnabled: newState });
 
-        // Tell background to toggle — background will forward to active tab and handle injection
         chrome.runtime.sendMessage({ type: "TOGGLE_BLUR", enabled: newState }, (resp) => {
             if (chrome.runtime.lastError) {
                 console.warn("Background message error:", chrome.runtime.lastError.message);
-            } else {
-                console.log("Background response:", resp);
-                if (resp && resp.status === "not_allowed") {
-                    alert("SafeLink cannot run on internal browser pages (chrome://, about:). Open a normal webpage to test.");
-                } else if (resp && resp.status === "failed") {
-                    alert("Could not apply blur on this page: " + (resp.error || "unknown"));
-                }
+            } else if (resp?.status === "not_allowed") {
+                alert("SafeLink can't cloak chrome:// realms. Step into the mortal web.");
+            } else if (resp?.status === "failed") {
+                alert("The veil did not fall — " + (resp.error || "unknown reason."));
             }
         });
     };
 
-    if (loading) return <div style={{ padding: 16 }}>Loading…</div>;
+    if (loading) {
+        return (
+            <div className="loading">
+                Loading…
+            </div>
+        );
+    }
 
     return (
-        <div style={{ width: 320, padding: 16, fontFamily: "Inter, sans-serif" }}>
-            <h2>SafeLink</h2>
+        <div className="popup-container">
+            <h2 className="popup-title">SafeLink</h2>
+
             <button
                 onClick={toggleBlur}
-                style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: 8,
-                    background: enabled ? "#16a34a" : "#374151",
-                    color: "#fff",
-                    border: "none",
-                    cursor: "pointer",
-                }}
+                className={`toggle-btn ${enabled ? "toggle-on" : "toggle-off"}`}
             >
                 {enabled ? "Privacy Mode: ON" : "Privacy Mode: OFF"}
             </button>
-            <p style={{ marginTop: 8, color: "#9CA3AF" }}>
-                {enabled ? "Masking enabled" : "Click to enable masking on the current page"}
+
+            <p className="popup-text">
+                {enabled
+                    ? "Sensitive information is now softly obscured."
+                    : "Activate to subtly mask private details."}
             </p>
         </div>
     );
